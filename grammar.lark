@@ -1,0 +1,12 @@
+start  : blocks
+
+blocks : (header topics)+
+
+header : "[" NAME ": " NAME "]" _BREAK_LINE
+
+topics : ("- " topic _BREAK_LINE)+ 
+
+topic: /[^\n]+/
+
+_BREAK_LINE : /\n/
+NAME: /[\w\d\-_]+/
