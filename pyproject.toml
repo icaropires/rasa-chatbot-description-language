@@ -1,0 +1,18 @@
+[project]
+license = "Apache 2.0"
+readme = "README.md"
+
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+
+[tool.flit.metadata]
+module = "rasa_language"
+classifiers = ["License :: OSI Approved :: Apache 2.0"]
+requires = [
+    "lark-parser",
+]
+
+[tool.flit.scripts]
+rasa_language = "rasa_language.__main__:main"

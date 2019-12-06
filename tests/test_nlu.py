@@ -1,4 +1,7 @@
-from rasa-language import parse
+import sys
+sys.path.insert(1, '../rasa_language')
+
+from parser import parse
 
 
 class TestNLU:
@@ -10,17 +13,17 @@ class TestNLU:
             '- hi'
         )
 
-        expected = (
-            'blocks', (
+        expected = [
+            'blocks', [
                 'block',
-                ('header', ('intent', 'ola')),
-                (
-                    'list', (
-                        ('topic', 'hello'),
-                        ('topic', 'hi')
-                    ),
-                )
-            )
-        )
+                ['header', ['intent', 'ola']],
+                [
+                    'list', [
+                        ['topic', 'hello'],
+                        ['topic', 'hi']
+                    ],
+                ]
+            ],
+        ]
 
-        assert intent == expected
+        assert parse(intent) == expected
