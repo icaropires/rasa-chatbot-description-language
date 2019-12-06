@@ -1,27 +1,16 @@
-import sys
-sys.path.insert(1, '../rasa_language')
-
-from parser import parse
+from rasa_language import parse
 
 
 class TestNLU:
-
     def test_intent(self):
-        intent = (
-            '[intent: ola]\n'
-            '- hello\n'
-            '- hi'
-        )
+        intent = "[intent: ola]\n" "- hello\n" "- hi"
 
         expected = [
-            'blocks', [
-                'block',
-                ['header', ['intent', 'ola']],
+            "blocks",
+            [
                 [
-                    'list', [
-                        ['topic', 'hello'],
-                        ['topic', 'hi']
-                    ],
+                    ["header", ["intent", "ola"]],
+                    ["topics", [["topic", "hello"], ["topic", "hi"]]],
                 ]
             ],
         ]

@@ -9,7 +9,8 @@ build-backend = "flit.buildapi"
 
 [tool.flit.metadata]
 module = "rasa_language"
-classifiers = ["License :: OSI Approved :: Apache 2.0"]
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+author = "Ícaro Pires e João Robson"
 requires = [
     "lark-parser",
 ]
