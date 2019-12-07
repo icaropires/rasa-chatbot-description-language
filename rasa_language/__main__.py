@@ -5,7 +5,7 @@ from . import __version__ as version
 
 def main():
     if len(argv) <= 1:
-        print('Wrong Usage')
+        print("Wrong Usage")
         exit(1)
 
     with open(argv[1]) as input_txt:
