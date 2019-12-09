@@ -1,6 +1,8 @@
 start  : blocks
 
-blocks : (header topics)+
+blocks : block+
+
+block :  header topics
 
 header : "[" NAME ": " NAME "]" _BREAK_LINE
 

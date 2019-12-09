@@ -9,6 +9,7 @@ class TestNLU:
             "blocks",
             [
                 [
+                    "block",
                     ["header", ["intent", "ola"]],
                     ["topics", [["topic", "hello"], ["topic", "hi"]]],
                 ]

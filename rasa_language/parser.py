@@ -4,10 +4,13 @@ from pathlib import Path
 
 class RasaTransformer(InlineTransformer):
     def start(self, blocks):
-        return ["blocks", blocks]
+        return blocks
 
     def blocks(self, *block):
-        return [list(block)]
+        return ["blocks", [*block]]
+
+    def block(self, *block):
+        return ["block", *block]
 
     def topics(self, *topic):
         return ["topics", list(topic)]
