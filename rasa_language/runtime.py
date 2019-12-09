@@ -20,7 +20,6 @@ def eval(x, env=None):
     head, *args = x
 
     if head == "blocks":
-        blocks = []
         for block in args[0]:
             eval(block, env)
         return env
