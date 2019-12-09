@@ -6,9 +6,8 @@ block :  header topics
 
 header : "[" NAME ": " NAME "]" _BREAK_LINE
 
-topics : ("- " topic _BREAK_LINE)+ 
+topics : ("- " TOPIC _BREAK_LINE)+ 
 
-topic: /[^\n]+/
-
+TOPIC : /[^\n]+/
 _BREAK_LINE : /\n/
 NAME: /[\w\d\-_]+/

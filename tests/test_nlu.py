@@ -11,7 +11,7 @@ class TestNLU:
                 [
                     "block",
                     ["header", ["intent", "ola"]],
-                    ["topics", [["topic", "hello"], ["topic", "hi"]]],
+                    ["topics", ["hello", "hi"]],
                 ]
             ],
         ]

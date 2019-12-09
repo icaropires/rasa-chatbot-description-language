@@ -13,10 +13,7 @@ class RasaTransformer(InlineTransformer):
         return ["block", *block]
 
     def topics(self, *topic):
-        return ["topics", list(topic)]
-
-    def topic(self, text):
-        return ["topic", str(text)]
+        return ["topics", [str(t) for t in topic]]
 
     def header(self, type_, name):
         return ["header", [str(type_), str(name)]]
