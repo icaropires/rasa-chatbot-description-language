@@ -6,8 +6,15 @@ block :  header topics _BREAK_LINE*
 
 header : "[" NAME ": " NAME "]" _BREAK_LINE
 
-topics : ("- " TOPIC _BREAK_LINE)+ 
+topics : ("- " (word " "?)+ _BREAK_LINE)+ 
 
-TOPIC : /[^\n]+/
+synonym : "{" NAME ":" (NAME "|"?)+ "}"
+
+word : TOPIC
+		  | synonym
+
+
+TOPIC : /[\w\[\]\-\+\_\?\!\:\;]+/
 _BREAK_LINE : /\n/
 NAME: /[\w\d\-_]+/
+SPACE: /" "/

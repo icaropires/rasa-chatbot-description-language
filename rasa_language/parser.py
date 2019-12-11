@@ -13,6 +13,7 @@ class RasaTransformer(InlineTransformer):
         return ["block", *block]
 
     def topics(self, *topic):
+        print('-----------', topic)
         return ["topics", [str(t) for t in topic]]
 
     def header(self, type_, name):
