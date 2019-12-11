@@ -2,7 +2,7 @@ start  : blocks
 
 blocks : block+
 
-block :  header topics
+block :  header topics _BREAK_LINE*
 
 header : "[" NAME ": " NAME "]" _BREAK_LINE
 

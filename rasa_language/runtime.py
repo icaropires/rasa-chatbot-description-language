@@ -36,6 +36,13 @@ def eval(x, env=None):
                 )
         elif type == "entity_synonyms":
             examples.append({"value": name, "synonyms": values})
+
+        elif type == "regex_features":
+            for value in values:
+                examples.append({"name": name, "pattern": value})
+        elif type == "lookup_tables":
+            examples.append({"name": name, "elements": values})
+
         env["rasa_nlu_data"][type].extend(examples)
         print("eee", env)
         return env
@@ -48,6 +55,12 @@ def eval(x, env=None):
 
     elif head == "synonym":
         return "entity_synonyms", args[0]
+
+    elif head == "regex":
+        return "regex_features", args[0]
+
+    elif head == "lookup":
+        return "lookup_tables", args[0]
 
     elif head == "topics":
         values = []
