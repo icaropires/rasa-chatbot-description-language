@@ -1,3 +1,6 @@
+import json
+import click
+import pathlib
 from .parser import parse
 
 
@@ -59,7 +62,16 @@ class RasaLanguage:
         self._dump_stories(bot_dir)
 
     def _dump_nlu(self, bot_dir):
-        ...
+        path = pathlib.Path(bot_dir) / "data" / "nlu.json"
+
+        with open(path, "w") as f_out:
+            json.dump(
+                self.nlu, f_out, ensure_ascii=False, indent=4, sort_keys=True
+            )
+
+            click.secho(
+                "NLU file generated succesfully!", fg="green", bold=True
+            )
 
     def _dump_domain(self, bot_dir):
         ...
