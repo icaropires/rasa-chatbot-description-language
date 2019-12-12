@@ -1,7 +1,3 @@
-from parser import parse
-import sys
-
-
 def eval_(expr, env=None):
     """
     Avalia expressão.
@@ -55,7 +51,3 @@ def eval_(expr, env=None):
         raise ValueError(f"Unexpected type on syntax tree: {head}")
 
     return env
-
-
-test = sys.stdin.read()
-print(eval_(parse(test)))
