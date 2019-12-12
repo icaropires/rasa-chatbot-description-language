@@ -1,4 +1,4 @@
-from rasa_language import parse, Runtime
+from rasa_language import parse, RasaLanguage
 
 
 class TestNLU:
@@ -18,7 +18,7 @@ class TestNLU:
 
         assert parse(intent) == expected
 
-    def test_run_intent(self):
+    def test_process_intent(self):
         intent = """[intent: star-wars]
 > lado negro da força
 > lado negro da forca
@@ -28,7 +28,7 @@ class TestNLU:
 > darth vader
 """
 
-        nlu_json = {
+        nlu = {
             "rasa_nlu_data": {
                 "common_examples": [
                     {
@@ -68,5 +68,7 @@ class TestNLU:
             }
         }
 
-        runtime = Runtime()
-        assert runtime.eval(parse(intent)) == nlu_json
+        lang = RasaLanguage()
+        lang.process(intent)
+
+        assert lang.nlu == nlu

@@ -1,17 +1,23 @@
-class Runtime:
+from .parser import parse
+
+
+class RasaLanguage:
     def __init__(self):
         self.nlu = {
-                "rasa_nlu_data": {
-                    "common_examples": [],
-                    "regex_features": [],
-                    "lookup_tables": [],
-                    "entity_synonyms": [],
-                }
+            "rasa_nlu_data": {
+                "common_examples": [],
+                "regex_features": [],
+                "lookup_tables": [],
+                "entity_synonyms": [],
             }
+        }
 
         self.domain = {}
 
         self.stories = {}
+
+    def process(self, text):
+        self.eval(parse(text))
 
     def eval(self, expr):
         head, *args = expr
@@ -21,8 +27,6 @@ class Runtime:
 
             for block in blocks:
                 self.eval(block)
-
-            return self.nlu
 
         elif head == "block":
             header, *topics = args
@@ -38,8 +42,6 @@ class Runtime:
 
                 self.nlu["rasa_nlu_data"]["common_examples"].extend(c_examples)
 
-            return self.nlu
-
         elif head == "header":
             type_, name = args
             return type_, name
@@ -51,4 +53,16 @@ class Runtime:
         else:
             raise ValueError(f"Unexpected type on syntax tree: {head}")
 
-        return self.nlu
+    def dump_files(self, bot_dir):
+        self._dump_nlu(bot_dir)
+        self._dump_domain(bot_dir)
+        self._dump_stories(bot_dir)
+
+    def _dump_nlu(self, bot_dir):
+        ...
+
+    def _dump_domain(self, bot_dir):
+        ...
+
+    def _dump_stories(self, bot_dir):
+        ...
