@@ -1,5 +1,4 @@
-import json
-from rasa_language import parse, eval_
+from rasa_language import parse, Runtime
 
 
 class TestNLU:
@@ -11,11 +10,9 @@ class TestNLU:
         expected = [
             "blocks",
             [
-                [
-                    "block",
-                    ["header", "intent", "greet"],
-                    ["topics", [">", "hello"], [">", "hi"]],
-                ]
+                "block",
+                ["header", "intent", "greet"],
+                ["topics", [">", "hello"], [">", "hi"]],
             ],
         ]
 
@@ -71,4 +68,5 @@ class TestNLU:
             }
         }
 
-        assert eval_(parse(intent)) == nlu_json
+        runtime = Runtime()
+        assert runtime.eval(parse(intent)) == nlu_json

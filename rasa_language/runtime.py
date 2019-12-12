@@ -1,53 +1,54 @@
-def eval_(expr, env=None):
-    """
-    Avalia expressão.
-    """
-
-    if env is None:
-        env = {
-            "rasa_nlu_data": {
-                "common_examples": [],
-                "regex_features": [],
-                "lookup_tables": [],
-                "entity_synonyms": [],
+class Runtime:
+    def __init__(self):
+        self.nlu = {
+                "rasa_nlu_data": {
+                    "common_examples": [],
+                    "regex_features": [],
+                    "lookup_tables": [],
+                    "entity_synonyms": [],
+                }
             }
-        }
 
-    head, *args = expr
+        self.domain = {}
 
-    if head == "blocks":
-        blocks = args[0]
+        self.stories = {}
 
-        for block in blocks:
-            eval_(block, env)
+    def eval(self, expr):
+        head, *args = expr
 
-        return env
+        if head == "blocks":
+            blocks = args
 
-    elif head == "block":
-        header, *topics = args
+            for block in blocks:
+                self.eval(block)
 
-        type_, name = eval_(header, env)
-        topics = eval_(*topics, env)
+            return self.nlu
 
-        if type_ == "intent":
-            c_examples = [
-                {"text": topic, "intent": name, "entities": []}
-                for _, topic in topics
-            ]
+        elif head == "block":
+            header, *topics = args
 
-            env["rasa_nlu_data"]["common_examples"].extend(c_examples)
+            type_, name = self.eval(header)
+            topics = self.eval(*topics)
 
-        return env
+            if type_ == "intent":
+                c_examples = [
+                    {"text": topic, "intent": name, "entities": []}
+                    for _, topic in topics
+                ]
 
-    elif head == "header":
-        type_, name = args
-        return type_, name
+                self.nlu["rasa_nlu_data"]["common_examples"].extend(c_examples)
 
-    elif head == "topics":
-        topics = args
-        return topics
+            return self.nlu
 
-    else:
-        raise ValueError(f"Unexpected type on syntax tree: {head}")
+        elif head == "header":
+            type_, name = args
+            return type_, name
 
-    return env
+        elif head == "topics":
+            topics = args
+            return topics
+
+        else:
+            raise ValueError(f"Unexpected type on syntax tree: {head}")
+
+        return self.nlu
