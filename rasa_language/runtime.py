@@ -2,7 +2,7 @@ from parser import parse
 import sys
 
 
-def eval(x, env=None):
+def eval_(expr, env=None):
     """
     Avalia expressão.
     """
@@ -16,64 +16,46 @@ def eval(x, env=None):
                 "entity_synonyms": [],
             }
         }
-    head, *args = x
+
+    head, *args = expr
 
     if head == "blocks":
-        for block in args[0]:
-            eval(block, env)
+        blocks = args[0]
+
+        for block in blocks:
+            eval_(block, env)
+
         return env
 
     elif head == "block":
-        examples = []
         header, *topics = args
-        type, name = eval(header, env)
-        values = eval(*topics)
-        if type == "common_examples":
-            for value in values:
-                examples.append(
-                    {"text": value, "intent": name, "entities": []}
-                )
-        elif type == "entity_synonyms":
-            examples.append(
-                {"value": name, "synonyms": values}
-            )
 
-        elif type == "regex_features":
-            for value in values:
-                examples.append(
-                    {"name": name, "pattern": value}
-                )
-        elif type == "lookup_tables":
-            examples.append({"name": name, "elements": values})
-            
-        env["rasa_nlu_data"][type].extend(examples)
+        type_, name = eval_(header, env)
+        topics = eval_(*topics, env)
+
+        if type_ == "intent":
+            c_examples = [
+                {"text": topic, "intent": name, "entities": []}
+                for _, topic in topics
+            ]
+
+            env["rasa_nlu_data"]["common_examples"].extend(c_examples)
+
         return env
 
     elif head == "header":
-        return eval(*args)
-
-    elif head == "intent":
-        return "common_examples", args[0]
-
-    elif head == "synonym":
-        return "entity_synonyms", args[0]
-
-    elif head == "regex":
-        return "regex_features", args[0]
-
-    elif head == "lookup":
-        return "lookup_tables", args[0]
+        type_, name = args
+        return type_, name
 
     elif head == "topics":
-        values = []
-        for topic in args[0]:
-            values.append(topic)
-        return values
+        topics = args
+        return topics
+
     else:
-        return None
+        raise ValueError(f"Unexpected type on syntax tree: {head}")
 
     return env
 
 
 test = sys.stdin.read()
-print(eval(parse(test)))
+print(eval_(parse(test)))

@@ -19,7 +19,7 @@ class RasaTransformer(InlineTransformer):
         return [str(marker), str(topic)]
 
     def header(self, type_, name):
-        return ["header", [str(type_), str(name)]]
+        return ["header", str(type_), str(name)]
 
 
 def _make_grammar():

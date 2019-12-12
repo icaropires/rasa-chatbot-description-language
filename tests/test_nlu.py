@@ -12,7 +12,7 @@ class TestNLU:
             [
                 [
                     "block",
-                    ["header", ["intent", "greet"]],
+                    ["header", "intent", "greet"],
                     ["topics", [">", "hello"], [">", "hi"]],
                 ]
             ],
