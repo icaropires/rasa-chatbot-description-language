@@ -39,26 +39,38 @@ class RasaLanguage:
                 self.eval(block)
 
         elif head == "block":
+            examples = []
+            nlu_type = ""
             header, *topics = args
 
             type_, name = self.eval(header)
             topics = self.eval(*topics)
 
             if type_ == "intent":
-                c_examples = [
-                    {"text": topic, "intent": name, "entities": []}
-                    for _, topic in topics
-                ]
-
-                self.nlu["rasa_nlu_data"]["common_examples"].extend(c_examples)
-                self.domain["intents"].append(name)
-
+                nlu_type = "common_examples"
+                for topic in topics:
+                    examples.append(
+                        {"text": topic[1], "intent": name, "entities": []}
+                    )
             elif type_ == "utter":
                 texts = [{"text": topic} for _, topic in topics]
 
                 utter_name = f"utter_{name}"
                 self.domain["templates"][utter_name] = texts
                 self.domain["actions"].append(utter_name)
+
+            elif type_ == "synonym":
+                nlu_type = "entity_synonyms"
+                examples.append({"value": name, "synonyms": topics})
+            elif type_ == "regex":
+                nlu_type = "regex_features"
+                for topic in topics:
+                    examples.append({"name": name, "pattern": topic})
+            elif type_ == "lookup":
+                nlu_type = "lookup_tables"
+                examples.append({"name": name, "elements": topics})
+
+            self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
 
         elif head == "header":
             type_, name = args
