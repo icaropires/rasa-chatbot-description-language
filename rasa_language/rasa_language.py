@@ -15,7 +15,13 @@ class RasaLanguage:
             }
         }
 
-        self.domain = {}
+        self.domain = {
+            "intents": [],
+            "actions": [],
+            "templates": [],
+            "slots": [],
+            "entities": [],
+        }
 
         self.stories = {}
 
@@ -44,6 +50,7 @@ class RasaLanguage:
                 ]
 
                 self.nlu["rasa_nlu_data"]["common_examples"].extend(c_examples)
+                self.domain["intents"].append(name)
 
         elif head == "header":
             type_, name = args
