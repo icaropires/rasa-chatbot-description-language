@@ -1,14 +1,56 @@
 import tempfile
 import pathlib
 import json
-from rasa_language import parse, RasaLanguage
+
+import pytest
+from rasa_language import parse
+
+
+@pytest.fixture
+def starwars_intent_nlu():
+    return {
+        "rasa_nlu_data": {
+            "common_examples": [
+                {
+                    "text": "lado negro da força",
+                    "intent": "star-wars",
+                    "entities": [],
+                },
+                {
+                    "text": "lado negro da forca",
+                    "intent": "star-wars",
+                    "entities": [],
+                },
+                {"text": "lado negro", "intent": "star-wars", "entities": []},
+                {
+                    "text": "frase de star wars",
+                    "intent": "star-wars",
+                    "entities": [],
+                },
+                {
+                    "text": "guerra nas estrelas",
+                    "intent": "star-wars",
+                    "entities": [],
+                },
+                {
+                    "text": "darth vader",
+                    "intent": "star-wars",
+                    "entities": [],
+                },
+            ],
+            "regex_features": [],
+            "lookup_tables": [],
+            "entity_synonyms": [],
+        }
+    }
 
 
 class TestNLU:
     def test_parse_intent(self):
-        intent = "[intent: greet]\n"
-        intent += "> hello\n"
-        intent += "> hi\n"
+        intent = """[intent: greet]
+> hello
+> hi
+"""
 
         expected = [
             "blocks",
@@ -21,84 +63,13 @@ class TestNLU:
 
         assert parse(intent) == expected
 
-    def test_process_intent(self):
-        intent = """[intent: star-wars]
-> lado negro da força
-> lado negro da forca
-> lado negro
-> frase de star wars
-> guerra nas estrelas
-> darth vader
-"""
+    def test_process_intent(self, lang, starwars_intent, starwars_intent_nlu):
+        lang.process(starwars_intent)
 
-        nlu = {
-            "rasa_nlu_data": {
-                "common_examples": [
-                    {
-                        "text": "lado negro da força",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                    {
-                        "text": "lado negro da forca",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                    {
-                        "text": "lado negro",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                    {
-                        "text": "frase de star wars",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                    {
-                        "text": "guerra nas estrelas",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                    {
-                        "text": "darth vader",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                ],
-                "regex_features": [],
-                "lookup_tables": [],
-                "entity_synonyms": [],
-            }
-        }
+        assert lang.nlu == starwars_intent_nlu
 
-        lang = RasaLanguage()
-        lang.process(intent)
-
-        assert lang.nlu == nlu
-
-    def test_nlu_dump(self):
-        nlu = {
-            "rasa_nlu_data": {
-                "common_examples": [
-                    {
-                        "text": "lado negro da força",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                    {
-                        "text": "lado negro da forca",
-                        "intent": "star-wars",
-                        "entities": [],
-                    },
-                ],
-                "regex_features": [],
-                "lookup_tables": [],
-                "entity_synonyms": [],
-            }
-        }
-
-        lang = RasaLanguage()
-        lang.nlu = nlu
+    def test_nlu_dump(self, lang, starwars_intent, starwars_intent_nlu):
+        lang.nlu = starwars_intent_nlu
 
         with tempfile.TemporaryDirectory() as d:
             path = pathlib.Path(d)
@@ -113,5 +84,8 @@ class TestNLU:
                 content = f.read()
 
                 assert content == json.dumps(
-                    nlu, ensure_ascii=False, sort_keys=True, indent=4
+                    starwars_intent_nlu,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    indent=4,
                 )

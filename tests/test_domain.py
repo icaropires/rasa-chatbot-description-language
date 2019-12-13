@@ -1,16 +1,5 @@
-from rasa_language import RasaLanguage
-
-
 class TestDomain:
-    def test_parse_domain(self):
-        intent = """[intent: greet]
-> hello
-> hi
-"""
-        print("@@@@@@@@@@@@@@@@@@")
-        print(intent)
-        print("@@@@@@@@@@@@@@@@@@")
-
+    def test_parse_domain(self, lang, greet_intent):
         exptected = {
             "intents": ["greet"],
             "actions": [],
@@ -19,7 +8,6 @@ class TestDomain:
             "entities": [],
         }
 
-        lang = RasaLanguage()
-        lang.process(intent)
+        lang.process(greet_intent)
 
         assert lang.domain == exptected
