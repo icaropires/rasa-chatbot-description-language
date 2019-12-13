@@ -18,6 +18,9 @@ class RasaTransformer(InlineTransformer):
     def topic(self, marker, *topic):
         text = ["text", ""]
         synonyms = ["synonyms", []]
+        intents = ["intents", []]
+        full_topic = []
+
         for ix, t in enumerate(topic):
             type_, *content = t
             text[1] += content[0]
@@ -33,13 +36,28 @@ class RasaTransformer(InlineTransformer):
                     text.append([start, end, content[0], content[1]])
 
                 synonyms[1].append(t[1:])
-
+            elif type_ == "intent":
+                if ix > 0:
+                    start = len(topic[ix - 1][1])
+                    end = start + len(content[0])
+                    text.append([start, end, content[0], content[1]])
+                else:
+                    start = 0
+                    end = len(content[0])
+                    text.append([start, end, content[0], content[1]])
+                intents[1].append(t[1:])
+        full_topic = [str(marker), text]
         if synonyms[1]:
-            return [str(marker), text, synonyms]
-        return [str(marker), text]
+            full_topic.append(synonyms)
+        if intents[1]:
+            full_topic.append(intents)
+        return full_topic
 
     def element(self, content):
         return content
+
+    def intent(self, name, intent_name):
+        return ["intent", str(name), str(intent_name)]
 
     def synonym(self, name, *synonyms):
         entity, *synonyms = [str(s) for s in synonyms]

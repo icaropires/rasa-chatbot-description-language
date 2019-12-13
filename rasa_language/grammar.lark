@@ -12,10 +12,13 @@ topics : topic+
 
 topic : MARKER _SPACE (element _SPACE*)+ _BREAK_LINE
 
+intent : "{" NAME "}{" NAME "}"
+
 synonym : "{" NAME "}{" NAME ":" (TEXT "|"?)+ "}"
 
 element: text 
 	  | synonym
+		| intent
 
 text : TEXT
 

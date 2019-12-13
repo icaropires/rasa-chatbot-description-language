@@ -70,11 +70,13 @@ class RasaLanguage:
             return text, entities
 
         elif head == "synonyms":
-            self._eval_synonyms(name, topics)
             for value, _, synonyms in args[0]:
                 self.nlu["rasa_nlu_data"]["entity_synonyms"].extend(
                     [{"value": value, "synonyms": synonyms}]
                 )
+
+        elif head == "intents":
+            ...
 
         elif head == "topics":
             topics = args
@@ -108,6 +110,7 @@ class RasaLanguage:
 
     def _eval_intents(self, name, topics):
         examples = []
+        intent_entities = []
 
         for topic in topics:
             for element in topic[1:]:
@@ -116,19 +119,21 @@ class RasaLanguage:
                     intent_text, entities = intent
 
                     if entities:
-                        start, end, value, entity = entities[0]
-                        entities = {
-                            "start": start,
-                            "end": end,
-                            "value": value,
-                            "entity": entity,
-                        }
+                        for entity_ in entities:
+                            start, end, value, entity = entity_
+                            entities = {
+                                "start": start,
+                                "end": end,
+                                "value": value,
+                                "entity": entity,
+                            }
+                            intent_entities.append(entities)
 
                     examples.append(
                         {
                             "text": intent_text,
                             "intent": name,
-                            "entities": entities,
+                            "entities": intent_entities,
                         }
                     )
         self.nlu["rasa_nlu_data"]["common_examples"].extend(examples)
