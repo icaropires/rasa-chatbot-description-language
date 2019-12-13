@@ -7,7 +7,7 @@ class RasaTransformer(InlineTransformer):
         return blocks
 
     def blocks(self, *blocks):
-        return ["blocks", [*blocks]]
+        return ["blocks", *blocks]
 
     def block(self, *block):
         return ["block", *block]
