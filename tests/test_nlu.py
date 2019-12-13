@@ -51,7 +51,7 @@ class TestNLU:
             [
                 "block",
                 ["header", "intent", "greet"],
-                ["topics", [">", "hello"], [">", "hi"]],
+                ["topics", [">", ["text", "hello"]], [">", ["text", "hi"]]],
             ],
         ]
 

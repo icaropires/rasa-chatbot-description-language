@@ -8,13 +8,14 @@ header : "[" NAME ": " NAME "]" _BREAK_LINE
 
 topics : topic+
 
-topic : MARKER _SPACE TEXT _BREAK_LINE
+topic : MARKER _SPACE (element _SPACE*)+ _BREAK_LINE
 
-synonym : "{" NAME ":" (NAME "|"?)+ "}"
+synonym : "{" NAME "}{" NAME ":" (NAME "|"?)+ "}"
 
-word : TEXT
+element: text 
 	  | synonym
 
+text : TEXT
 
 MARKER : /[>-]/
 TEXT : /[\w\[\]\-+_?!:;,. ]+/

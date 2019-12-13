@@ -49,9 +49,26 @@ class RasaLanguage:
             if type_ == "intent":
                 nlu_type = "common_examples"
                 for topic in topics:
-                    examples.append(
-                        {"text": topic[1], "intent": name, "entities": []}
-                    )
+                    for element in topic[1:]:
+                        intent = self.eval(element)
+                        if intent:
+                            intent_text, entities = intent
+                            if entities:
+                                start, end, value, entity = entities[0]
+                                entities = {
+                                    "start": start,
+                                    "end": end,
+                                    "value": value,
+                                    "entity": entity,
+                                }
+                            examples.append(
+                                {
+                                    "text": intent_text,
+                                    "intent": name,
+                                    "entities": entities,
+                                }
+                            )
+
             elif type_ == "utter":
                 texts = [{"text": topic} for _, topic in topics]
 
@@ -75,6 +92,16 @@ class RasaLanguage:
         elif head == "header":
             type_, name = args
             return type_, name
+
+        elif head == "text":
+            text, *entities = args
+            return text, entities
+
+        elif head == "synonyms":
+            for value, _, synonyms in args[0]:
+                self.nlu["rasa_nlu_data"]["entity_synonyms"].extend(
+                    [{"value": value, "synonyms": synonyms}]
+                )
 
         elif head == "topics":
             topics = args
