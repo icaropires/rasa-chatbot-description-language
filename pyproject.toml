@@ -11,8 +11,12 @@ build-backend = "flit.buildapi"
 module = "rasa_language"
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 author = "Ícaro Pires e João Robson"
+home-page = "https://github.com/icaropires/rasa-chatbot-description-language"
 requires = [
-    "lark-parser",
+    "lark-parser>=0.7.8",
+    "Click>=7.0",
+    "colorama>=0.4.3",
+    "PyYAML==5.2"
 ]
 
 [tool.flit.scripts]
