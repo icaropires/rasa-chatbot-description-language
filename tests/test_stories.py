@@ -18,14 +18,12 @@ class TestStories:
         expected = {
             "star-wars": [
                 {"type": "intent", "name": "star-wars", "entities": {}},
-                {"type": "action", "name": "star-wars"},
+                {"type": "action", "name": "utter_star-wars"},
             ]
         }
 
         lang.process(story)
-        print("@@@@@@@@@@@@@")
-        print(lang.stories)  # TODO: Não achando a intent e o utter
-        print("@@@@@@@@@@@@@")
+
         assert lang.stories == expected
 
     def test_stories_dump(self, lang, tmpdir):

@@ -108,7 +108,7 @@ class RasaLanguage:
                             and story_steps[-1]["type"] == "intent"
                         ):
                             raise ValueError(
-                                f"Invalid Story: '{name}'."
+                                f"Invalid story: '{name}'."
                                 " Two consecutive intents!"
                             )
 
@@ -117,22 +117,25 @@ class RasaLanguage:
                         intents = self.nlu["rasa_nlu_data"]["common_examples"]
 
                         for intent in intents:
-                            if intent["text"] == topic:
+                            intent_text = topic[1]
+                            if intent["text"] == intent_text:
                                 step["name"] = intent["intent"]
                                 break
 
-                    else:
-                        step["type"] = "action"
+                        step["entities"] = {}  # TODO: Add real data
 
+                    elif marker == "-":
+                        step["type"] = "action"
                         templates = self.domain["templates"]
 
                         for utter, samples in templates.items():
                             for sample in samples:
-                                if sample["text"] == topic:
+                                topic_text = topic[1]
+                                if sample["text"] == topic_text:
                                     step["name"] = utter
                                     break
-
-                    # TODO: step["entities"]
+                    else:
+                        raise ValueError(f"Invalid marker '{marker}'")
 
                     story_steps.append(step)
 
