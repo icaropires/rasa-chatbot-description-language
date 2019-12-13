@@ -68,9 +68,11 @@ class RasaLanguage:
                                     "entities": entities,
                                 }
                             )
+                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
+                self.domain["intents"].append(name)
 
             elif type_ == "utter":
-                texts = [{"text": topic} for _, topic in topics]
+                texts = [{"text": topic[1]} for _, topic in topics]
 
                 utter_name = f"utter_{name}"
                 self.domain["templates"][utter_name] = texts
@@ -79,15 +81,18 @@ class RasaLanguage:
             elif type_ == "synonym":
                 nlu_type = "entity_synonyms"
                 examples.append({"value": name, "synonyms": topics})
+                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
+
             elif type_ == "regex":
                 nlu_type = "regex_features"
                 for topic in topics:
                     examples.append({"name": name, "pattern": topic})
+                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
+
             elif type_ == "lookup":
                 nlu_type = "lookup_tables"
                 examples.append({"name": name, "elements": topics})
-
-            self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
+                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
 
         elif head == "header":
             type_, name = args
