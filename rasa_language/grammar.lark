@@ -5,6 +5,8 @@ blocks : block+
 block :  header topics _BREAK_LINE*
 
 header : "[" NAME ": " NAME "]" _BREAK_LINE
+       | "[" NAME "]" _BREAK_LINE -> header_story
+
 
 topics : topic+
 

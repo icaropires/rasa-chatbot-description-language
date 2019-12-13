@@ -85,8 +85,10 @@ class RasaLanguage:
 
             elif type_ == "regex":
                 nlu_type = "regex_features"
+
                 for topic in topics:
                     examples.append({"name": name, "pattern": topic})
+
                 self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
 
             elif type_ == "lookup":
@@ -94,9 +96,55 @@ class RasaLanguage:
                 examples.append({"name": name, "elements": topics})
                 self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
 
+            elif type_ == "story":
+                story_steps = []
+
+                for marker, topic in topics:
+                    step = {}
+
+                    if marker == ">":
+                        if (
+                            len(story_steps) > 1
+                            and story_steps[-1]["type"] == "intent"
+                        ):
+                            raise ValueError(
+                                f"Invalid Story: '{name}'."
+                                " Two consecutive intents!"
+                            )
+
+                        step["type"] = "intent"
+
+                        intents = self.nlu["rasa_nlu_data"]["common_examples"]
+
+                        for intent in intents:
+                            if intent["text"] == topic:
+                                step["name"] = intent["intent"]
+                                break
+
+                    else:
+                        step["type"] = "action"
+
+                        templates = self.domain["templates"]
+
+                        for utter, samples in templates.items():
+                            for sample in samples:
+                                if sample["text"] == topic:
+                                    step["name"] = utter
+                                    break
+
+                    # TODO: step["entities"]
+
+                    story_steps.append(step)
+
+                self.stories[name] = story_steps
+
         elif head == "header":
             type_, name = args
             return type_, name
+
+        elif head == "header_story":
+            name = args[0]
+            return "story", name
 
         elif head == "text":
             text, *entities = args

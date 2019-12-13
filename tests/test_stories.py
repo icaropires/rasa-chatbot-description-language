@@ -23,6 +23,9 @@ class TestStories:
         }
 
         lang.process(story)
+        print("@@@@@@@@@@@@@")
+        print(lang.stories)  # TODO: Não achando a intent e o utter
+        print("@@@@@@@@@@@@@")
         assert lang.stories == expected
 
     def test_stories_dump(self, lang, tmpdir):

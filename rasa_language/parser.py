@@ -31,7 +31,9 @@ class RasaTransformer(InlineTransformer):
                     start = 0
                     end = len(content[0])
                     text.append([start, end, content[0], content[1]])
+
                 synonyms[1].append(t[1:])
+
         if synonyms[1]:
             return [str(marker), text, synonyms]
         return [str(marker), text]
@@ -48,6 +50,9 @@ class RasaTransformer(InlineTransformer):
 
     def header(self, type_, name):
         return ["header", str(type_), str(name)]
+
+    def header_story(self, name):
+        return ["header_story", str(name)]
 
 
 def _make_grammar():
