@@ -7,6 +7,8 @@ from .parser import parse
 
 class RasaLanguage:
     def __init__(self):
+        self.parse = parse
+
         self.nlu = {
             "rasa_nlu_data": {
                 "common_examples": [],
@@ -27,119 +29,33 @@ class RasaLanguage:
         self.stories = {}
 
     def process(self, text):
-        self.eval(parse(text))
+        self._eval(self.parse(text))
 
-    def eval(self, expr):
+    def _eval(self, expr):
         head, *args = expr
 
         if head == "blocks":
             blocks = args
 
             for block in blocks:
-                self.eval(block)
+                self._eval(block)
 
         elif head == "block":
-            examples = []
-            nlu_type = ""
             header, *topics = args
 
-            type_, name = self.eval(header)
-            topics = self.eval(*topics)
+            type_, name = self._eval(header)
+            topics = self._eval(*topics)
 
-            if type_ == "intent":
-                nlu_type = "common_examples"
-                for topic in topics:
-                    for element in topic[1:]:
-                        intent = self.eval(element)
-                        if intent:
-                            intent_text, entities = intent
-                            if entities:
-                                start, end, value, entity = entities[0]
-                                entities = {
-                                    "start": start,
-                                    "end": end,
-                                    "value": value,
-                                    "entity": entity,
-                                }
-                            examples.append(
-                                {
-                                    "text": intent_text,
-                                    "intent": name,
-                                    "entities": entities,
-                                }
-                            )
-                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
-                self.domain["intents"].append(name)
+            block_evals = {
+                "intent": self._eval_intents,
+                "utter": self._eval_utters,
+                "synonym": self._eval_synonym,
+                "regex": self._eval_regexes,
+                "lookup": self._eval_lookups,
+                "story": self._eval_stories,
+            }
 
-            elif type_ == "utter":
-                texts = [{"text": topic[1]} for _, topic in topics]
-
-                utter_name = f"utter_{name}"
-                self.domain["templates"][utter_name] = texts
-                self.domain["actions"].append(utter_name)
-
-            elif type_ == "synonym":
-                nlu_type = "entity_synonyms"
-                examples.append({"value": name, "synonyms": topics})
-                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
-
-            elif type_ == "regex":
-                nlu_type = "regex_features"
-
-                for topic in topics:
-                    examples.append({"name": name, "pattern": topic})
-
-                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
-
-            elif type_ == "lookup":
-                nlu_type = "lookup_tables"
-                examples.append({"name": name, "elements": topics})
-                self.nlu["rasa_nlu_data"][nlu_type].extend(examples)
-
-            elif type_ == "story":
-                story_steps = []
-
-                for marker, topic in topics:
-                    step = {}
-
-                    if marker == ">":
-                        if (
-                            len(story_steps) > 1
-                            and story_steps[-1]["type"] == "intent"
-                        ):
-                            raise ValueError(
-                                f"Invalid story: '{name}'."
-                                " Two consecutive intents!"
-                            )
-
-                        step["type"] = "intent"
-
-                        intents = self.nlu["rasa_nlu_data"]["common_examples"]
-
-                        for intent in intents:
-                            intent_text = topic[1]
-                            if intent["text"] == intent_text:
-                                step["name"] = intent["intent"]
-                                break
-
-                        step["entities"] = {}  # TODO: Add real data
-
-                    elif marker == "-":
-                        step["type"] = "action"
-                        templates = self.domain["templates"]
-
-                        for utter, samples in templates.items():
-                            for sample in samples:
-                                topic_text = topic[1]
-                                if sample["text"] == topic_text:
-                                    step["name"] = utter
-                                    break
-                    else:
-                        raise ValueError(f"Invalid marker '{marker}'")
-
-                    story_steps.append(step)
-
-                self.stories[name] = story_steps
+            block_evals[type_](name, topics)
 
         elif head == "header":
             type_, name = args
@@ -154,6 +70,7 @@ class RasaLanguage:
             return text, entities
 
         elif head == "synonyms":
+            self._eval_synonyms(name, topics)
             for value, _, synonyms in args[0]:
                 self.nlu["rasa_nlu_data"]["entity_synonyms"].extend(
                     [{"value": value, "synonyms": synonyms}]
@@ -165,6 +82,101 @@ class RasaLanguage:
 
         else:
             raise ValueError(f"Unexpected type on syntax tree: {head}")
+
+    def _eval_regexes(self, name, topics):
+        self.nlu["rasa_nlu_data"]["regex_features"].extend(
+            [{"name": name, "pattern": topic} for topic in topics]
+        )
+
+    def _eval_lookups(self, name, topics):
+        self.nlu["rasa_nlu_data"]["lookup_tables"].extend(
+            {"name": name, "elements": topics}
+        )
+
+    def _eval_synonym(self, name, topics):
+        self.nlu["rasa_nlu_data"]["entity_synonyms"].extend(
+            {"value": name, "synonyms": topics}
+        )
+
+    def _eval_utters(self, name, topics):
+        texts = [{"text": topic[1]} for _, topic in topics]
+
+        utter_name = f"utter_{name}"
+
+        self.domain["templates"][utter_name] = texts
+        self.domain["actions"].append(utter_name)
+
+    def _eval_intents(self, name, topics):
+        examples = []
+
+        for topic in topics:
+            for element in topic[1:]:
+                intent = self._eval(element)
+                if intent:
+                    intent_text, entities = intent
+
+                    if entities:
+                        start, end, value, entity = entities[0]
+                        entities = {
+                            "start": start,
+                            "end": end,
+                            "value": value,
+                            "entity": entity,
+                        }
+
+                    examples.append(
+                        {
+                            "text": intent_text,
+                            "intent": name,
+                            "entities": entities,
+                        }
+                    )
+        self.nlu["rasa_nlu_data"]["common_examples"].extend(examples)
+        self.domain["intents"].append(name)
+
+    def _eval_stories(self, name, topics):
+        story_steps = []
+
+        for marker, topic in topics:
+            step = {}
+
+            if marker == ">":
+                if (
+                    len(story_steps) > 1
+                    and story_steps[-1]["type"] == "intent"
+                ):
+                    raise ValueError(
+                        f"Invalid story: '{name}'." " Two consecutive intents!"
+                    )
+
+                step["type"] = "intent"
+
+                intents = self.nlu["rasa_nlu_data"]["common_examples"]
+
+                for intent in intents:
+                    intent_text = topic[1]
+                    if intent["text"] == intent_text:
+                        step["name"] = intent["intent"]
+                        break
+
+                step["entities"] = {}  # TODO: Add real entities
+
+            elif marker == "-":
+                step["type"] = "action"
+                templates = self.domain["templates"]
+
+                for utter, samples in templates.items():
+                    for sample in samples:
+                        topic_text = topic[1]
+                        if sample["text"] == topic_text:
+                            step["name"] = utter
+                            break
+            else:
+                raise ValueError(f"Invalid marker '{marker}'")
+
+            story_steps.append(step)
+
+        self.stories[name] = story_steps
 
     def dump_files(self, bot_dir):
         self._dump_nlu(bot_dir)
