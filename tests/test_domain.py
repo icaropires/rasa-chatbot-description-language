@@ -4,20 +4,18 @@ import pathlib
 class TestDomain:
     def test_process_domain(self, lang, greet_intent):
         expected = {
-            "intents": ["greet"],
-            "actions": [],
-            "templates": {},
             "slots": [],
             "entities": [],
+            "intents": ["greet"],
+            "templates": {},
+            "actions": [],
         }
 
         lang.process(greet_intent)
 
         assert lang.domain == expected
 
-    def test_utter(
-        self, lang,
-    ):
+    def test_utter(self, lang):
         utters = """[utter: star-wars]
 - O medo leva à raiva, a raiva leva ao ódio e o ódio leva ao sofrimento.
 - Que a Força esteja com você!
@@ -27,8 +25,9 @@ class TestDomain:
 """
 
         expected = {
+            "slots": [],
+            "entities": [],
             "intents": [],
-            "actions": ["utter_star-wars"],
             "templates": {
                 "utter_star-wars": [
                     {
@@ -53,8 +52,7 @@ class TestDomain:
                     {"text": "Muito a aprender você ainda tem."},
                 ]
             },
-            "slots": [],
-            "entities": [],
+            "actions": ["utter_star-wars"],
         }
 
         lang.process(utters)
@@ -66,7 +64,6 @@ class TestDomain:
             "actions": [],
             "templates": {},
             "slots": [],
-            "entities": [],
         }
 
         expected = """intents:

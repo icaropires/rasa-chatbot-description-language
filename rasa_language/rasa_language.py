@@ -17,11 +17,11 @@ class RasaLanguage:
         }
 
         self.domain = {
-            "intents": [],
-            "actions": [],
-            "templates": {},
             "slots": [],
             "entities": [],
+            "intents": [],
+            "templates": {},
+            "actions": [],
         }
 
         self.stories = {}
@@ -96,7 +96,18 @@ class RasaLanguage:
         self.domain = {k: v for k, v in self.domain.items() if v}
 
         with open(path, "w") as f:
-            f.write(yaml.dump(self.domain, default_flow_style=False))
+            stream = yaml.dump(
+                self.domain,
+                default_flow_style=False,
+                allow_unicode=True,
+                sort_keys=False,
+            )
+
+            # Insert blank lines between top level keys
+            for key in tuple(self.domain.keys())[1:]:
+                stream = stream.replace(key, f"\n{key}")
+
+            f.write(stream)
 
     def _dump_stories(self, bot_dir):
         path = pathlib.Path(bot_dir) / "stories.md"
