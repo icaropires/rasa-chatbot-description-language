@@ -92,10 +92,35 @@ class RasaLanguage:
             f.write(yaml.dump(self.domain, default_flow_style=False))
 
     def _dump_stories(self, bot_dir):
-        ...
+        path = pathlib.Path(bot_dir) / "stories.md"
+
+        with open(path, "w") as f:
+            f.write(self._get_story_as_md())
 
     @staticmethod
     def _echo_succesfully_dumped(filename):
         click.secho(
             f"{filename} file generated succesfully!", fg="green", bold=True
         )
+
+    def _get_story_as_md(self):
+        md = ""
+
+        for story_name, topics in self.stories.items():
+            md += f"## {story_name}\n"
+
+            for topic in topics:
+                if topic["type"] == "intent":
+                    md += f"* {topic['name']}"
+
+                    md += (
+                        json.dumps(topic["entities"], ensure_ascii=False)
+                        if topic["entities"]
+                        else ""
+                    )
+
+                    md += "\n"
+                elif topic["type"] == "action":
+                    md += f" - {topic['name']}\n"
+
+        return md
