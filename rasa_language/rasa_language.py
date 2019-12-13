@@ -200,6 +200,14 @@ class RasaLanguage:
 
     def _dump_nlu(self, bot_dir):
         path = pathlib.Path(bot_dir) / "data" / "nlu.json"
+        path_md = pathlib.Path(bot_dir) / "data" / "nlu.md"
+
+        if path_md.exists():
+            click.secho(
+                "\nWARNING: nlu.md found! Delete it for avoiding conflicts!\n",
+                color="yellow",
+                bold=True,
+            )
 
         with open(path, "w") as f:
             json.dump(
@@ -245,7 +253,12 @@ class RasaLanguage:
             md += f"## {story_name}\n"
             for topic in topics:
                 if topic["type"] == "intent":
-                    md += f"* {topic['name']}"
+                    try:
+                        md += f"* {topic['name']}"
+                    except KeyError:
+                        raise ValueError(
+                            f"Intent not found for phrase {topic}"
+                        )
 
                     md += (
                         json.dumps(topic["entities"], ensure_ascii=False)
@@ -255,6 +268,11 @@ class RasaLanguage:
 
                     md += "\n"
                 elif topic["type"] == "action":
-                    md += f" - {topic['name']}\n"
+                    try:
+                        md += f" - {topic['name']}\n"
+                    except KeyError:
+                        raise ValueError(
+                            f"Action not found for phrase {topic}"
+                        )
 
         return md

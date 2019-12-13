@@ -10,7 +10,6 @@ from .rasa_language import RasaLanguage
 def main(src_file, bot_dir):
     lang = RasaLanguage()
 
-    click.echo("Processing files...")
     lang.process(src_file.read())
     lang.dump_files(bot_dir)
 
