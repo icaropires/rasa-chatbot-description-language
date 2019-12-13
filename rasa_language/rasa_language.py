@@ -19,7 +19,7 @@ class RasaLanguage:
         self.domain = {
             "intents": [],
             "actions": [],
-            "templates": [],
+            "templates": {},
             "slots": [],
             "entities": [],
         }
@@ -53,6 +53,13 @@ class RasaLanguage:
                 self.nlu["rasa_nlu_data"]["common_examples"].extend(c_examples)
                 self.domain["intents"].append(name)
 
+            elif type_ == "utter":
+                texts = [{"text": topic} for _, topic in topics]
+
+                utter_name = f"utter_{name}"
+                self.domain["templates"][utter_name] = texts
+                self.domain["actions"].append(utter_name)
+
         elif head == "header":
             type_, name = args
             return type_, name
@@ -69,7 +76,7 @@ class RasaLanguage:
         self._echo_succesfully_dumped("NLU")
 
         self._dump_stories(bot_dir)
-        # self._echo_succesfully_dumped('Stories')
+        self._echo_succesfully_dumped("Stories")
 
         self._dump_domain(bot_dir)
         self._echo_succesfully_dumped("Domain")
