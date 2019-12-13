@@ -1,4 +1,5 @@
 import json
+import yaml
 import click
 import pathlib
 from .parser import parse
@@ -65,23 +66,36 @@ class RasaLanguage:
 
     def dump_files(self, bot_dir):
         self._dump_nlu(bot_dir)
-        self._dump_domain(bot_dir)
+        self._echo_succesfully_dumped("NLU")
+
         self._dump_stories(bot_dir)
+        # self._echo_succesfully_dumped('Stories')
+
+        self._dump_domain(bot_dir)
+        self._echo_succesfully_dumped("Domain")
 
     def _dump_nlu(self, bot_dir):
         path = pathlib.Path(bot_dir) / "data" / "nlu.json"
 
-        with open(path, "w") as f_out:
+        with open(path, "w") as f:
             json.dump(
-                self.nlu, f_out, ensure_ascii=False, indent=4, sort_keys=True
-            )
-
-            click.secho(
-                "NLU file generated succesfully!", fg="green", bold=True
+                self.nlu, f, ensure_ascii=False, indent=4, sort_keys=True
             )
 
     def _dump_domain(self, bot_dir):
-        ...
+        path = pathlib.Path(bot_dir) / "domain.yml"
+
+        # Remove keys with empty values
+        self.domain = {k: v for k, v in self.domain.items() if v}
+
+        with open(path, "w") as f:
+            f.write(yaml.dump(self.domain, default_flow_style=False))
 
     def _dump_stories(self, bot_dir):
         ...
+
+    @staticmethod
+    def _echo_succesfully_dumped(filename):
+        click.secho(
+            f"{filename} file generated succesfully!", fg="green", bold=True
+        )

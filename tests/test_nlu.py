@@ -1,4 +1,3 @@
-import tempfile
 import pathlib
 import json
 
@@ -68,24 +67,16 @@ class TestNLU:
 
         assert lang.nlu == starwars_intent_nlu
 
-    def test_nlu_dump(self, lang, starwars_intent, starwars_intent_nlu):
+    def test_nlu_dump(
+        self, lang, starwars_intent, starwars_intent_nlu, tmpdir
+    ):
         lang.nlu = starwars_intent_nlu
 
-        with tempfile.TemporaryDirectory() as d:
-            path = pathlib.Path(d)
+        f = tmpdir.mkdir("data").join("nlu.json")
 
-            sub_path = path / "data"
-            sub_path.mkdir()
+        path = pathlib.Path(tmpdir)
+        lang.dump_files(path)
 
-            lang.dump_files(str(path))
-
-            sub_path = sub_path / "nlu.json"
-            with open(str(sub_path), "r") as f:
-                content = f.read()
-
-                assert content == json.dumps(
-                    starwars_intent_nlu,
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    indent=4,
-                )
+        assert f.read() == json.dumps(
+            starwars_intent_nlu, ensure_ascii=False, sort_keys=True, indent=4,
+        )
