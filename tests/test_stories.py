@@ -49,8 +49,7 @@ class TestStories:
  - utter_bye
 """
 
-        tmpdir.mkdir("data")
-        f = tmpdir.join("stories.md")
+        f = tmpdir.mkdir("data").join("stories.md")
 
         path = pathlib.Path(tmpdir)
         lang.dump_files(path)

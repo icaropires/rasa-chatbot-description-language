@@ -222,7 +222,7 @@ class RasaLanguage:
             f.write(stream)
 
     def _dump_stories(self, bot_dir):
-        path = pathlib.Path(bot_dir) / "stories.md"
+        path = pathlib.Path(bot_dir) / "data" / "stories.md"
 
         with open(path, "w") as f:
             f.write(self._get_story_as_md())
@@ -238,7 +238,6 @@ class RasaLanguage:
 
         for story_name, topics in self.stories.items():
             md += f"## {story_name}\n"
-
             for topic in topics:
                 if topic["type"] == "intent":
                     md += f"* {topic['name']}"

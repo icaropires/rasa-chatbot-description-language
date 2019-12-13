@@ -20,6 +20,7 @@ class RasaTransformer(InlineTransformer):
         synonyms = ["synonyms", []]
         intents = ["intents", []]
         full_topic = []
+        text_len = 0
 
         for ix, t in enumerate(topic):
             type_, *content = t
@@ -27,7 +28,7 @@ class RasaTransformer(InlineTransformer):
             if type_ == "synonym":
                 # se o sinônimo não aparece na primeira posição
                 if ix > 0:
-                    start = len(topic[ix - 1][1])
+                    start = text_len
                     end = start + len(content[0])
                     text.append([start, end, content[0], content[1]])
                 else:
@@ -38,7 +39,7 @@ class RasaTransformer(InlineTransformer):
                 synonyms[1].append(t[1:])
             elif type_ == "intent":
                 if ix > 0:
-                    start = len(topic[ix - 1][1])
+                    start = text_len
                     end = start + len(content[0])
                     text.append([start, end, content[0], content[1]])
                 else:
@@ -46,6 +47,7 @@ class RasaTransformer(InlineTransformer):
                     end = len(content[0])
                     text.append([start, end, content[0], content[1]])
                 intents[1].append(t[1:])
+            text_len += len(content[0])
         full_topic = [str(marker), text]
         if synonyms[1]:
             full_topic.append(synonyms)
