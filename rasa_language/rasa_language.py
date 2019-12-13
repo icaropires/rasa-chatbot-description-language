@@ -30,21 +30,22 @@ class RasaLanguage:
 
     def process(self, text):
         self._eval(self.parse(text))
+        self._eval(self.parse(text), False)
 
-    def _eval(self, expr):
+    def _eval(self, expr, ignore_story=True):
         head, *args = expr
 
         if head == "blocks":
             blocks = args
 
             for block in blocks:
-                self._eval(block)
+                self._eval(block, ignore_story)
 
         elif head == "block":
             header, *topics = args
 
-            type_, name = self._eval(header)
-            topics = self._eval(*topics)
+            type_, name = self._eval(header, ignore_story)
+            topics = self._eval(*topics, ignore_story)
 
             block_evals = {
                 "intent": self._eval_intents,
@@ -55,7 +56,11 @@ class RasaLanguage:
                 "story": self._eval_stories,
             }
 
-            block_evals[type_](name, topics)
+            if type_ != "story" and ignore_story:
+                block_evals[type_](name, topics)
+            elif type_ == "story":
+                if not ignore_story:
+                    block_evals[type_](name, topics)
 
         elif head == "header":
             type_, name = args
@@ -151,7 +156,7 @@ class RasaLanguage:
                     and story_steps[-1]["type"] == "intent"
                 ):
                     raise ValueError(
-                        f"Invalid story: '{name}'." " Two consecutive intents!"
+                        f"Invalid story: '{name}'. Two consecutive intents!"
                     )
 
                 step["type"] = "intent"

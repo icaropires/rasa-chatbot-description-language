@@ -3,17 +3,17 @@ import pathlib
 
 class TestStories:
     def test_stories_process(self, lang):
-        story = """[intent: star-wars]
+        story = """[star-wars]
+> Quero conselhos do yoda
+- O medo é o caminho para o lado negro.
+
+[intent: star-wars]
 > Quero conselhos do yoda
 > Eu gostaria de conselhos do mestre
 
 [utter: star-wars]
 - O medo é o caminho para o lado negro.
 - Que a Força esteja com você!
-
-[star-wars]
-> Quero conselhos do yoda
-- O medo é o caminho para o lado negro.
 """
         expected = {
             "star-wars": [
