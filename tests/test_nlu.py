@@ -57,6 +57,47 @@ class TestNLU:
 
         assert parse(greet_intent) == expected
 
+    def test_parse_intent_with_synonyms(self, programming_lang_intent):
+        expected = [
+            "blocks",
+            [
+                "block",
+                ["header", "intent", "programming"],
+                [
+                    "topics",
+                    [
+                        ">",
+                        [
+                            "text",
+                            "Você gosta de programar em JS?",
+                            [27, 29, "JS", "lang"],
+                        ],
+                        [
+                            "synonyms",
+                            [
+                                [
+                                    "JS",
+                                    "lang",
+                                    [
+                                        "java",
+                                        "php",
+                                        "javascript",
+                                        "haskell",
+                                        "python",
+                                        "c",
+                                        "c++",
+                                        "c#",
+                                    ],
+                                ]
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]
+
+        assert parse(programming_lang_intent) == expected
+
     def test_process_intent(self, lang, starwars_intent, starwars_intent_nlu):
         lang.process(starwars_intent)
 

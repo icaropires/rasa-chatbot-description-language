@@ -16,6 +16,15 @@ def greet_intent():
 
 
 @pytest.fixture
+def programming_lang_intent():
+    return (
+        "[intent: programming]\n"
+        "> Você gosta de programar em {JS}{lang:java|php|javascript|"
+        "haskell|python|c|c++|c#}?\n"
+    )
+
+
+@pytest.fixture
 def starwars_intent():
     return """[intent: star-wars]
 > lado negro da força

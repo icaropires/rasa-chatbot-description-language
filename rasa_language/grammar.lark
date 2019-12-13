@@ -10,7 +10,7 @@ topics : topic+
 
 topic : MARKER _SPACE (element _SPACE*)+ _BREAK_LINE
 
-synonym : "{" NAME "}{" NAME ":" (NAME "|"?)+ "}"
+synonym : "{" NAME "}{" NAME ":" (TEXT "|"?)+ "}"
 
 element: text 
 	  | synonym
@@ -18,7 +18,7 @@ element: text
 text : TEXT
 
 MARKER : /[>-]/
-TEXT : /[\w\[\]\-+_?!:;,. ]+/
+TEXT : /[\w\[\]\-+_?!:;,. #]+/
 NAME: /[\w\d\-_]+/
 _BREAK_LINE : /\n/
 _SPACE: " "
