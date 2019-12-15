@@ -64,7 +64,7 @@ They could be defined inside the content of intents and utters, like this:
 ```
 [star-wars]                                                                     
 > I don't believe.
-- I find our lack of faith disturbing.
+- I find your lack of faith disturbing.
 ```
 
 
